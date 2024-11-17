@@ -1,0 +1,122 @@
+openapi: 3.0.0
+info:
+  title: Data Lake Web Api
+  description: API for select and download data from Data Lake 
+  version: 1.0.0
+
+servers:
+  - url: 'http://datalake-web.com/api'
+    description: Main server
+
+paths:
+  /alive:
+    get:
+      summary: Check is service alive
+      description: This route serves checking service status
+      responses:
+        '200':
+          description: Service is alive
+
+  /select:
+    post:
+      summary: Select data using sql query
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                query:
+                  type: string
+              example:
+                query: file_type = 'itr' limit 5
+      responses:
+        '200':
+          description: Data selected successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Data selected successfully
+  /download:
+    post:
+      summary: Download all data using sql query
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                query:
+                  type: string
+              example:
+                query: file_type = 'itr' limit 5
+      responses:
+        '200':
+          description: Data selected successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Data selected successfully
+    
+  /download/{fileName}:
+    post:
+      summary: Download file
+      description: This route serves downloading file
+      parameters:
+        - name: fileName
+          in: path
+          description: File name that needs to be fetched
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Data downloaded successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Data downloaded successfully
+    
+components:
+  schemas:
+    FilesList:
+      type: object
+      properties:
+        file_id:
+          type: string
+          example: "xyz"
+        file_name:
+          type: string
+          example: "file_name"
+        file_type:
+          type: string
+          example: ".txt"
+        file_path:
+          type: string
+          example: "/path/to/data/"
+        file_url:
+          type: string
+          example: "s3://bucket/path/to/data/"
+        order_id:
+          type: string
+          example: "foo"
+        study:
+          type: string
+          example: "bar"
+        scaner_type:
+          type: string
+          example: "baz"

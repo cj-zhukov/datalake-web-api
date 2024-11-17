@@ -1,0 +1,29 @@
+[package]
+name = "datalake-web-api"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+tokio = { version = "1", features= ["full"] }
+tokio-stream = "0.1"
+tokio-util = "0.7"
+futures-util = "0.3"
+axum = { version = "0.7", features = ["macros"] }
+axum-extra = "0.9"
+chrono = { version = "0.4", features = ["serde"] }
+tower-http = { version = "0.6", features = ["trace", "cors"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+anyhow = "1"
+datafusion = { version = "42", features = ["default"] }
+arrow-json = "53"
+parquet = "53"
+aws-config = "1"
+aws-sdk-s3 = "1"
+aws-creds = "0.37"
+aws-smithy-types = "1"
+object_store = { version = "0.11", features = ["aws", "cloud"] }
+url = "2"
+itertools = "0.13"
+async_zip = "0.0.17"
+dotenvy = "0.15.7"
