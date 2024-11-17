@@ -1,10 +1,15 @@
 use color_eyre::Result;
 use axum::{
-    body::Body, extract::{Path, State}, http::StatusCode, response::Response, Json
+    body::Body, 
+    extract::State, 
+    response::Response, 
+    Json
 };
 use serde::Deserialize;
 
 use crate::{app_state::AppState, data_store::aws::Table, utils::utils::zip_data};
+use crate::data_store::error::DataStoreError;
+use crate::error::ApiError;
 
 #[derive(Deserialize)]
 pub struct QueryDownloadRequest {
@@ -14,25 +19,37 @@ pub struct QueryDownloadRequest {
 pub async fn post_download(
     State(state): State<AppState>,
     Json(input): Json<QueryDownloadRequest>
-) -> Result<Response, StatusCode> {
-    let data = Table::download(state.ctx, input.query.as_deref()).await.unwrap();
-    let zipped_data = zip_data(data).await.unwrap();
-    let body = Body::from(zipped_data);
-    let response = Response::builder()
-        .status(200)
-        .body(body)
-        .unwrap();
+) -> Result<Response, ApiError> {
+    match Table::download(state.ctx, state.client, input.query.as_deref()).await {
+        Ok(records) => {
+            let zipped_data = zip_data(records)
+                .await
+                .map_err(|e| ApiError::UnexpectedError(e.into()))?;
+            
+            let body = Body::from(zipped_data);
 
-    Ok(response)
+            let response = Response::builder()
+                .status(200)
+                .body(body)
+                .map_err(|e| ApiError::UnexpectedError(e.into()))?;
+    
+            Ok(response)
+        },
+        Err(e) => match e {
+            DataStoreError::IncorrectQuery => Err(ApiError::IncorrectQuery),
+            DataStoreError::QueryResultIsEmpty => Err(ApiError::QueryResultIsEmpty),
+            DataStoreError::UnexpectedError(e) => Err(ApiError::UnexpectedError(e.into())),
+        }
+    }
 }
 
-pub async fn post_download_id(Path(file_name): Path<String>) -> Result<Response, StatusCode> {
-    let data = Table::download_id(&file_name).await.unwrap();
-    let body = Body::from(data);
-    let response = Response::builder()
-        .status(200)
-        .body(body)
-        .unwrap();
+// pub async fn post_download_id(Path(file_name): Path<String>) -> Result<Response, StatusCode> {
+//     let data = Table::download_id(&file_name).await.unwrap();
+//     let body = Body::from(data);
+//     let response = Response::builder()
+//         .status(200)
+//         .body(body)
+//         .unwrap();
 
-    Ok(response)
-}
+//     Ok(response)
+// }

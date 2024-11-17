@@ -1,4 +1,4 @@
-use anyhow::Result;
+use color_eyre::Result;
 use async_zip::{base::write::ZipFileWriter, Compression, ZipEntryBuilder};
 
 pub async fn zip_data(files: Vec<Vec<u8>>) -> Result<Vec<u8>> {

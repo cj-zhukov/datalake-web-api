@@ -1,10 +1,10 @@
 use axum::{routing::{get, post}, serve::Serve, Router};
 use color_eyre::Result;
-use routes::{ping, post_select, post_download_id, post_download};
+use routes::{ping, post_select, post_download};
 
 pub mod app_state;
-pub mod error;
 pub mod data_store;
+pub mod error;
 pub mod routes;
 pub mod utils;
 
@@ -26,7 +26,7 @@ impl Application {
             .route("/alive", get(ping))
             .route("/select", post(post_select))
             .route("/download", post(post_download))
-            .route("/download/:id", post(post_download_id))
+            // .route("/download/:id", post(post_download_id))
             .with_state(app_state);
 
         let listener = tokio::net::TcpListener::bind(address).await?;

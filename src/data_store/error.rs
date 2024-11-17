@@ -6,8 +6,8 @@ pub enum DataStoreError {
     #[error("Incorrect query")]
     IncorrectQuery,
 
-    #[error("Query result not found")]
-    QueryResultNotFound,
+    #[error("Query result is empty")]
+    QueryResultIsEmpty,
     
     #[error("Unexpected error")]
     UnexpectedError(#[source] Report),

@@ -8,12 +8,12 @@ use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
 #[derive(Debug, Error)]
-pub enum APIError {
+pub enum ApiError {
     #[error("Incorrect query")]
     IncorrectQuery,
 
-    #[error("Query result not found")]
-    QueryResultNotFound,
+    #[error("Query result is empty")]
+    QueryResultIsEmpty,
     
     #[error("Unexpected error")]
     UnexpectedError(#[source] Report),
@@ -24,12 +24,12 @@ pub struct ErrorResponse {
     pub error: String,
 }
 
-impl IntoResponse for APIError {
+impl IntoResponse for ApiError {
     fn into_response(self) -> Response {
         let (status, error_message) = match self {
-            APIError::IncorrectQuery => (StatusCode::BAD_REQUEST, "Incorrect query"),
-            APIError::QueryResultNotFound => (StatusCode::NOT_FOUND, "Not found"),
-            APIError::UnexpectedError(_) => (StatusCode::INTERNAL_SERVER_ERROR, "Unexpected error"),
+            ApiError::IncorrectQuery => (StatusCode::BAD_REQUEST, "Incorrect query"),
+            ApiError::QueryResultIsEmpty => (StatusCode::NOT_FOUND, "Not found"),
+            ApiError::UnexpectedError(_) => (StatusCode::INTERNAL_SERVER_ERROR, "Unexpected error"),
         };
         let body = Json(ErrorResponse {
             error: error_message.to_string(),
