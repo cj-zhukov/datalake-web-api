@@ -9,6 +9,7 @@ pub mod env {
 }
 
 pub const REGION: &str = "eu-central-1";
+pub const TABLE_NAME: &str = "t";
 
 pub mod prod {
     pub const APP_ADDRESS: &str = "0.0.0.0:80";

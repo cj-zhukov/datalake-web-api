@@ -1,12 +1,10 @@
-use anyhow::Result;
+use color_eyre::Result;
 use axum::{
-    http::StatusCode, 
-    response::IntoResponse, 
-    Json
+    extract::State, http::StatusCode, response::IntoResponse, Json
 };
 use serde::{Deserialize, Serialize};
 
-use crate::data_store::aws::Table;
+use crate::{app_state::AppState, data_store::aws::Table};
 
 #[derive(Deserialize)]
 pub struct SelectRequest {
@@ -19,8 +17,13 @@ pub struct SelectResponse {
     pub content: Option<Vec<Table>>,
 }
 
-pub async fn post_select(Json(input): Json<SelectRequest>) -> Result<impl IntoResponse, Json<SelectResponse>> {
-    let records = Table::select(input.query.as_deref()).await.map_err(|_| {
+pub async fn post_select(
+    State(state): State<AppState>,
+    Json(input): Json<SelectRequest>
+) -> Result<impl IntoResponse, Json<SelectResponse>> {
+    let records = Table::select(state.ctx, input.query.as_deref())
+        .await
+        .map_err(|_| {
         Json(SelectResponse {
             message: format!("Failed selecting table with query: {:?}", input.query.as_deref()),
             content: None,

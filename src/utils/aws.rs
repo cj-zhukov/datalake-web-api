@@ -1,6 +1,6 @@
 use std::time::Duration;
 
-use anyhow::Result;
+use color_eyre::eyre::Result;
 use aws_config::{retry::RetryConfig, timeout::TimeoutConfig, BehaviorVersion, Region};
 use aws_sdk_s3::{operation::get_object::GetObjectOutput, Client};
 use aws_sdk_s3::config::Builder;
