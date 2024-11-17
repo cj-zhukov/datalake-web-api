@@ -11,7 +11,7 @@ use std::sync::Arc;
 use url::Url;
 
 use crate::utils::aws::{get_aws_client, read_file};
-use crate::utils::constants::{BUCKET_DOWNLOAD, REGION};
+use crate::utils::constants::{BUCKET_DOWNLOAD, REGION, TABLE_NAME};
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Table {
@@ -25,45 +25,16 @@ pub struct Table {
 }
 
 impl Table {
-    // async fn init() -> Result<SessionContext> {
-    //     let creds = Credentials::default()?;
-    //     let aws_access_key_id = creds.access_key.unwrap_or_default();
-    //     let aws_secret_access_key = creds.secret_key.unwrap_or_default();
-    //     let aws_session_token = creds.session_token.unwrap_or_default();
-        
-    //     let bucket = BUCKET_SELECT.as_str();
-    //     let region = REGION;
-    //     let key = PREFIX_SELECT.as_str();
-
-    //     let s3 = AmazonS3Builder::new()
-    //         .with_bucket_name(bucket)
-    //         .with_region(region)
-    //         .with_access_key_id(aws_access_key_id)
-    //         .with_secret_access_key(aws_secret_access_key)
-    //         .with_token(aws_session_token)
-    //         .build()?;
-    
-    //     let path = format!("s3://{bucket}");
-    //     let s3_url = Url::parse(&path)?;
-    //     let ctx = SessionContext::new();
-    //     ctx.runtime_env().register_object_store(&s3_url, Arc::new(s3));
-    
-    //     let path = format!("s3://{bucket}/{key}");
-    //     ctx.register_parquet("t", &path, ParquetReadOptions::default()).await?;
-
-    //     Ok(ctx)
-    // }
-
     async fn read(ctx: SessionContext, sql: Option<&str>) -> Result<DataFrame> {
         let sql = match sql {
             Some(query) => { 
                 if query.contains("limit") {
-                    format!("select * from t where {query}")
+                    format!("select * from {TABLE_NAME} where {query}")
                 } else {
-                    format!("select * from t where {query} limit 5")
+                    format!("select * from {TABLE_NAME} where {query} limit 10")
                 }
             }
-            None => "select * from t limit 10".to_string(),
+            None => format!("select * from {TABLE_NAME} limit 10"),
         };
         
         println!("reading data to df");
@@ -73,9 +44,8 @@ impl Table {
     }
 
     async fn read_id(id: &str) -> Result<DataFrame> {
-        // let ctx = Table::init().await?;
         let ctx = SessionContext::new();
-        let sql = format!("select * from t where file_name = '{}'", id);
+        let sql = format!("select * from {TABLE_NAME} where file_name = '{id}'");
         println!("reading data to df");
         let df = ctx.sql(&sql).await?;
 
@@ -186,10 +156,6 @@ pub async fn init(region: &str, bucket: &str, key: &str, table_name: &str) -> Re
     let aws_secret_access_key = creds.secret_key.unwrap_or_default();
     let aws_session_token = creds.session_token.unwrap_or_default();
     
-    // let bucket = BUCKET_SELECT.as_str();
-    // let region = REGION;
-    // let key = PREFIX_SELECT.as_str();
-
     let s3 = AmazonS3Builder::new()
         .with_bucket_name(bucket)
         .with_region(region)
