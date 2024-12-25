@@ -30,7 +30,7 @@ paths:
                 query:
                   type: string
               example:
-                query: file_type = 'itr' limit 5
+                query: file_type = 'parquet' limit 5
       responses:
         '200':
           description: Data selected successfully
@@ -55,7 +55,7 @@ paths:
                 query:
                   type: string
               example:
-                query: file_type = 'itr' limit 5
+                query: file_type = 'parquet' limit 5
       responses:
         '200':
           description: Data selected successfully
