@@ -42,14 +42,3 @@ pub async fn post_download(
         }
     }
 }
-
-// pub async fn post_download_id(Path(file_name): Path<String>) -> Result<Response, StatusCode> {
-//     let data = Table::download_id(&file_name).await.unwrap();
-//     let body = Body::from(data);
-//     let response = Response::builder()
-//         .status(200)
-//         .body(body)
-//         .unwrap();
-
-//     Ok(response)
-// }

@@ -26,7 +26,6 @@ impl Application {
             .route("/alive", get(ping))
             .route("/select", post(post_select))
             .route("/download", post(post_download))
-            // .route("/download/:id", post(post_download_id))
             .with_state(app_state);
 
         let listener = tokio::net::TcpListener::bind(address).await?;
